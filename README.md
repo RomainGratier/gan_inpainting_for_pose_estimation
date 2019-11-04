@@ -1,2 +1,2 @@
 # gan_inpainting_for_pose_estimation
-tackle pose estimation while occlusion appear with generative adversarial models
+Tackle the occlusion issues on pose estimation by cropping fake occlusions and inpaint the cropped area

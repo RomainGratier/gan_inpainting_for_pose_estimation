@@ -22,6 +22,12 @@ import pickle
 with open('pre_process_folder/occluders.pkl', 'rb') as f:
     occluders = pickle.load(f)
     
+occlusion_list = []
+
+for i in [7, 34, 37, 139, 153, 247, 249, 276, 312, 402, 435, 446, 449, 479]:
+    occlusion_list.append[occluders[i]]
+    
+    
 def create_folder(name):
     os.makedirs(name, exist_ok=True)
     
@@ -110,5 +116,5 @@ def main(dataDir, dataType, annFile_full, annFile_human_pose, occluders):
 
                 
 if __name__ == '__main__':
-    main(dataDir, dataType, annFile_full, annFile_human_pose, occluders)
+    main(dataDir, dataType, annFile_full, annFile_human_pose, occlusion_list)
  

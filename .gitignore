@@ -1,3 +1,49 @@
+data/
+check/
+checkpoints/
+configs/
+datasets/
+deep-high-resolution-net.pytorch/
+gan-env/
+gen_img/
+generative-inpainting-pytorch/
+generative_inpainting/
+model/
+occ_img/
+pre_process_folder/
+real_img/
+results/
+synthetic-occlusion/
+utils/
+
+repo_venv/
+/models
+!src/models/
+*.ipynb_checkpoints
+*.pickle
+*.csv
+*.pyc
+*.png
+*.json
+*.ipynb_checkpoints*
+*__pycache__*
+
+*.cfg
+*.weights
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+
+# C extensions
+*.so
+
+# Distribution / packaging
+eggs/
+*.egg-info/
+.installed.cfg
+*.egg
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

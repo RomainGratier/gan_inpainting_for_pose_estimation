@@ -17,7 +17,6 @@ import cv2
 import PIL.Image
 
 import os
-import random
 from argparse import ArgumentParser
 from PIL import Image
 
@@ -275,7 +274,7 @@ def occlude_with_objects(im, occluders):
 
     result = im.copy()
     width_height = np.asarray([im.shape[1], im.shape[0]])
-    occluder = occluders[8]
+    occluder = random.sample(occluders, 1)
     
     im_scale_factor = min(width_height) / 256
     random_scale_factor = np.random.uniform(0.8, 1)

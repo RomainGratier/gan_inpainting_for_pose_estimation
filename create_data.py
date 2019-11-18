@@ -6,7 +6,7 @@ import PIL.Image
 from PIL import Image
 import cv2
 import skimage.io as io
-from utils_dataset import make_grid, from_torch_img_to_numpy, generate, load_occluders, occlude_with_objects, paste_over, resize_by_factor, list_filepaths
+from utils_dataset import make_grid, from_torch_img_to_numpy, generate, load_occluders, occlude_with_objects, paste_over, list_filepaths
 
 dataDir='datasets/coco'
 dataType='val2017'
@@ -25,7 +25,7 @@ with open('pre_process_folder/occluders.pkl', 'rb') as f:
 occlusion_list = []
 
 for i in [7, 34, 37, 139, 153, 247, 249, 276, 312, 402, 435, 446, 449, 479]:
-    occlusion_list.append[occluders[i]]
+    occlusion_list.append(occluders[i])
     
     
 def create_folder(name):
@@ -60,11 +60,7 @@ def main(dataDir, dataType, annFile_full, annFile_human_pose, occluders):
         img = coco.loadImgs(img_id)[0]
 
         annIds = coco_kps.getAnnIds(imgIds=img['id'], catIds=catIds, iscrowd=0)
-        print('idssssssssssssss')
-        print(img_id)
-        print(annIds)
-        print(img['id'])
-        pass
+        
         if len(annIds) != 1:
             continue
     
@@ -91,16 +87,20 @@ def main(dataDir, dataType, annFile_full, annFile_human_pose, occluders):
         x_y_occ_mask = [end_pt[0]-start_pt[0], end_pt[1]-start_pt[1]]
         center_arr = np.round(center).astype(np.int32)
         c_main_img =[center_arr[0]+bbox[0], center_arr[1]+bbox[1]]
-        alpha = 5
-        x_y_mask = [c_main_img[1] - x_y_occ_mask[1] - alpha, c_main_img[0] - x_y_occ_mask[0]- alpha]
+        alpha = 0
+        max_crop_side = max(x_y_occ_mask)
+        x_y_mask = [c_main_img[1] - max_crop_side - alpha, c_main_img[0] - max_crop_side - alpha]
 
         occ_arr[bbox[1]:bbox[1]+bbox[3], bbox[0]:bbox[0]+bbox[2], :] = occluded_im
 
         print(' --------------------------- CROPPING ---------------------------')
-        max_crop_side = max(x_y_occ_mask)
+        
         img_for_generation = arr[x_y_mask[0]:x_y_mask[0]+max_crop_side*2 + alpha, x_y_mask[1]:x_y_mask[1]+max_crop_side*2 + alpha, :]
         
-        if (img_for_generation.shape[0] == 0) or (img_for_generation.shape[1] == 0):
+        y0 = x_y_mask[0] ; x0 = x_y_mask[1]
+        y1 = x_y_mask[0]+max_crop_side*2 + alpha ; x1 = x_y_mask[1]+max_crop_side*2 + alpha
+        
+        if (x0 <= 0) or (y0 <= 0) or (y1 >arr.shape[0]) or (x1 >arr.shape[1]):
             print(' --------------------------- CONTINUE --------------------------- ')
             continue
         
@@ -109,6 +109,7 @@ def main(dataDir, dataType, annFile_full, annFile_human_pose, occluders):
         gen_arr[x_y_mask[0]:x_y_mask[0]+max_crop_side*2 + alpha, x_y_mask[1]:x_y_mask[1]+max_crop_side*2 + alpha, :] = final_gen_img
         
         print(' --------------------------- Saving ---------------------------')
+        
         # Save images
         save_img_jpg(occ_arr, img_id, annIds, img_directory_occluded)
         save_img_jpg(gen_arr, img_id, annIds, img_directory_generate)

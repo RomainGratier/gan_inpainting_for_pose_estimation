@@ -274,13 +274,20 @@ def occlude_with_objects(im, occluders):
 
     result = im.copy()
     width_height = np.asarray([im.shape[1], im.shape[0]])
-    occluder = random.sample(occluders, 1)
+    occluder = random.sample(occluders, 1)[0]
     
     im_scale_factor = min(width_height) / 256
-    random_scale_factor = np.random.uniform(0.8, 1)
-    scale_factor = random_scale_factor * im_scale_factor #* 1.2
-    occluder = resize_by_factor(occluder, scale_factor)
-    center = np.random.uniform([0+occluder.shape[0]/2,0+occluder.shape[1]/2], width_height -[occluder.shape[0]/2, occluder.shape[1]/2])
+    random_scale_factor = np.random.uniform(0.25, 0.4)
+    
+    #scale_factor = random_scale_factor * im_scale_factor #* 1.2
+    scale_factor = random_scale_factor #* im_scale_factor #* 1.2
+    
+    #occluder = resize_by_factor(occluder, scale_factor)
+    occluder = resize_by_factor_based_on_area(im.shape[0]*im.shape[1], occluder, scale_factor)
+    
+    #center = np.random.uniform([0+occluder.shape[0]/2,0+occluder.shape[1]/2], width_height -[occluder.shape[0]/2, occluder.shape[1]/2])
+    center = np.random.uniform([0+im.shape[0]/2,0+im.shape[1]/2], width_height -[im.shape[0]/2, im.shape[1]/2])
+    
     start_pt, end_pt = paste_over(im_src=occluder, im_dst=result, center=center)
     
     return result, start_pt, end_pt, center
@@ -319,6 +326,15 @@ def paste_over(im_src, im_dst, center):
     im_dst[start_dst[1]:end_dst[1], start_dst[0]:end_dst[0]] = (
             alpha * color_src + (1 - alpha) * region_dst)
     return start_dst, end_dst
+
+
+def resize_by_factor_based_on_area(A_img, im, scale_factor):
+    """Returns a copy of `im` resized by `factor`, using bilinear interp for up and area interp
+    for downscaling.
+    """
+    ratio = scale_factor * A_img / (im.shape[0] * im.shape[1])
+    new_size = tuple(np.round(np.array([im.shape[1] * math.sqrt(ratio) , im.shape[0]  * math.sqrt(ratio)])).astype(int))
+    return cv2.resize(im, new_size, interpolation=cv2.INTER_AREA)
 
 
 def resize_by_factor(im, factor):
